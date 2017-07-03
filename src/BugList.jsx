@@ -50,7 +50,7 @@ var BugList = React.createClass({
     return (
       <div>
         <h1>Bug Tracker</h1>
-        <BugFilter />
+        <BugFilter submitHandler={this.loadData}/>
         <hr />
         <BugTable bugs={this.state.bugs}/>
         <hr />
@@ -60,7 +60,15 @@ var BugList = React.createClass({
   },
 
   componentDidMount: function () {
-    fetch(`/api/bugs`).then(response =>
+    this.loadData({});
+  },
+  loadData: function(filter) {
+    const search = Object.keys(filter)
+      .filter(k => filter[k] !== '')
+      .map(k => `${encodeURIComponent(k)}=${encodeURIComponent(filter[k])}`)
+      .join('&');
+
+    fetch(`/api/bugs?`+search).then(response =>
       response.json()
     ).then(bugs => {
       this.setState({bugs});
@@ -70,6 +78,7 @@ var BugList = React.createClass({
     });
 
     // In production, we'd also handle errors.
+
   },
   addBug: function (newBug) {
     console.log("Adding bug:", newBug);
